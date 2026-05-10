@@ -1,19 +1,24 @@
 const axios = require('axios');
 
 const API_URL = 'http://localhost:3000/api/auth';
+
+// Read test admin password from environment to avoid committing secrets.
+const TEST_ADMIN_PASSWORD = process.env.TEST_ADMIN_PASSWORD || '[REDACTED]';
+const TEST_ADMIN_EMAIL = process.env.TEST_ADMIN_EMAIL || '[REDACTED]';
+
 const testCases = [
   {
     description: "Valid login",
     credentials: {
-      email: "admin@hospital.com",
-      password: "Admin@123" // Use the correct password
+      email: TEST_ADMIN_EMAIL,
+      password: TEST_ADMIN_PASSWORD
     }
   },
   {
     description: "Wrong password",
     credentials: {
-      email: "admin@hospital.com",
-      password: "wrongpassword"
+      email: TEST_ADMIN_EMAIL,
+      password: process.env.TEST_WRONG_PASSWORD || '[REDACTED]'
     }
   }
 ];

@@ -22,17 +22,19 @@ async function recreateAdmin() {
     
     // Delete the old admin user
     console.log('Deleting old admin user...');
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '[REDACTED]';
     await pool.request()
-      .query('DELETE FROM users WHERE email = \'admin@hospital.com\'');
+      .input('email', sql.NVarChar, ADMIN_EMAIL)
+      .query('DELETE FROM users WHERE email = @email');
     
     // Create new admin with properly hashed password
     console.log('Creating new admin user...');
-    const password = 'Admin@123';
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '[REDACTED]';
+    const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
     
     // First insert the user
     await pool.request()
-      .input('email', sql.NVarChar, 'admin@hospital.com')
+      .input('email', sql.NVarChar, ADMIN_EMAIL)
       .input('password', sql.NVarChar, hashedPassword)
       .input('role', sql.NVarChar, 'admin')
       .query(`
@@ -42,7 +44,7 @@ async function recreateAdmin() {
     
     // Then retrieve the inserted user
     const result = await pool.request()
-      .input('email', sql.NVarChar, 'admin@hospital.com')
+      .input('email', sql.NVarChar, ADMIN_EMAIL)
       .query(`
         SELECT id, email, role 
         FROM users 
@@ -51,7 +53,7 @@ async function recreateAdmin() {
     
     console.log('\n✅ Admin user recreated successfully!');
     console.log('Email:', result.recordset[0].email);
-    console.log('Password: Admin@123');
+    console.log('Password: <set via ADMIN_PASSWORD environment variable>');
     console.log('Role:', result.recordset[0].role);
 
   } catch (error) {

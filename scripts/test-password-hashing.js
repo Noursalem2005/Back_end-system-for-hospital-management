@@ -5,9 +5,8 @@ async function testPasswordHashing() {
     console.log('Testing password hashing...');
     
     // Test password hashing
-    const password = 'TestPass123!';
+    const password = process.env.TEST_PASSWORD || 'TestPass123!';
     const hashedPassword = await authService.hashPassword(password);
-    console.log('Original password:', password);
     console.log('Hashed password:', hashedPassword);
     
     // Test password verification

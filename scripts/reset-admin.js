@@ -22,16 +22,18 @@ async function resetAdmin() {
     
     // Delete existing admin
     console.log('Removing existing admin...');
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '[REDACTED]';
     await pool.request()
-      .query('DELETE FROM users WHERE email = \'admin@hospital.com\'');
+      .input('email', sql.NVarChar, ADMIN_EMAIL)
+      .query('DELETE FROM users WHERE email = @email');
     
     // Create new admin
     console.log('Creating new admin user...');
-    const password = 'Admin@123';
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '[REDACTED]';
+    const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
     
     const result = await pool.request()
-      .input('email', sql.NVarChar, 'admin@hospital.com')
+      .input('email', sql.NVarChar, ADMIN_EMAIL)
       .input('password', sql.NVarChar, hashedPassword)
       .input('role', sql.NVarChar, 'admin')
       .query(`
@@ -42,7 +44,7 @@ async function resetAdmin() {
     
     console.log('\nAdmin user created successfully!');
     console.log('Email:', result.recordset[0].email);
-    console.log('Password: Admin@123');
+    console.log('Password: <set via ADMIN_PASSWORD environment variable>');
     console.log('Role:', result.recordset[0].role);
 
   } catch (error) {
